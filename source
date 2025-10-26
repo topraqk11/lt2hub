@@ -5,6 +5,7 @@ local Notify = loadstring(game:HttpGet("https://raw.githubusercontent.com/topraq
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
+print(31)
 
 local Window = Rayfield:CreateWindow({
     Name = "Helixia Hub",
