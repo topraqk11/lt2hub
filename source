@@ -170,11 +170,8 @@ local TeleportTab = Window:CreateTab("Teleport", "map-pin")
 TeleportTab:CreateSection("Location Teleport")
 
 local locations = {
-	["Shop"] = CFrame.new(120, 20, -200),
-	["Bridge"] = CFrame.new(150, 25, -350),
-	["Cave Entrance"] = CFrame.new(80, 15, -100),
-	["Volcano"] = CFrame.new(300, 50, -600),
-	["Spawn Area"] = CFrame.new(100, 20, -150),
+	["Spawn"] = CFrame.new(155.4, 3.0, 58.0),
+    ["Wood RUs"] = CFrame.new(259.7, 3.2, 57.7)
 }
 
 local locationNames = {}
@@ -242,7 +239,7 @@ TeleportTab:CreateButton({
 		end
 
 		local target = Players:FindFirstChild(selectedPlayer)
-		if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+		if target and target.Character and target ~= LocalPlayer and target.Character:FindFirstChild("HumanoidRootPart") then
 			local root = target.Character.HumanoidRootPart
 			LocalPlayer.Character:MoveTo(root.Position + Vector3.new(0, 5, 0))
 		end
