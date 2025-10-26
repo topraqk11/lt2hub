@@ -39,7 +39,7 @@ local Label = HomeTab:CreateLabel("Owner: Memati", "crown")
 
 local serverSection = HomeTab:CreateSection("Server");
 HomeTab:CreateButton({
-	Title = "Rejoin Server",
+	Name = "Rejoin Server",
 	Callback = function()
 		local TeleportService = game:GetService("TeleportService");
 		TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer);
@@ -47,7 +47,7 @@ HomeTab:CreateButton({
 });
 
 HomeTab:CreateButton({
-	Title = "Join Another Server",
+	Name = "Join Another Server",
 	Callback = function()
 		local TeleportService = game:GetService("TeleportService");
 		local HttpService = game:GetService("HttpService");
