@@ -65,6 +65,7 @@ local function checkSpookyTrees()
 
             -- Label güncelle
             if spookyFound then
+                print(spookyFound)
                 spookyLabel:Set("Spooky: Available")
 
                 -- Eğer buton yoksa oluştur
