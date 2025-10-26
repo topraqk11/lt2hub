@@ -65,7 +65,7 @@ local function checkSpookyTrees()
 
             -- Label güncelle
             if spookyFound then
-                print(spookyFound)
+                print(spookyFound.Parent, spookyFound:FindFirstChild("WoodSection"))
                 spookyLabel:Set("Spooky: Available")
 
                 -- Eğer buton yoksa oluştur
