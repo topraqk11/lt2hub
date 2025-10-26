@@ -1,5 +1,11 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
+local Notify = loadstring(game:HttpGet("https://raw.githubusercontent.com/topraqk1/helixia-hub/refs/heads/main/Scripts/notification.lua"))()
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Workspace = game:GetService("Workspace")
+
 local Window = Rayfield:CreateWindow({
     Name = "Helixia Hub",
     LoadingTitle = "Loading...",
@@ -159,6 +165,86 @@ WorldTab:CreateToggle({
 	end,
 })
 
+local TeleportTab = Window:CreateTab("Teleport", "map-pin")
+TeleportTab:CreateSection("Player Teleport")
+
+local function GetPlayerNames()
+	local names = {}
+	for _, plr in ipairs(Players:GetPlayers()) do
+		if plr ~= LocalPlayer then
+			table.insert(names, plr.Name)
+		end
+	end
+	return names
+end
+
+local playerList = GetPlayerNames()
+local selectedPlayer = playerList[1] or nil
+
+local PlayerDropdown = TeleportTab:CreateDropdown({
+	Name = "Select Player",
+	Options = playerList,
+	CurrentOption = selectedPlayer and {selectedPlayer} or {},
+	MultipleOptions = false,
+	Flag = "SelectedTeleportPlayer",
+	Callback = function(option)
+		selectedPlayer = option[1]
+	end
+})
+
+local function RefreshDropdown()
+	local newList = GetPlayerNames()
+	PlayerDropdown:Refresh(newList, true)
+end
+
+Players.PlayerAdded:Connect(RefreshDropdown)
+Players.PlayerRemoving:Connect(RefreshDropdown)
+
+TeleportTab:CreateButton({
+	Name = "Teleport Player",
+	Callback = function()
+		if not selectedPlayer then
+			return
+		end
+
+		local target = Players:FindFirstChild(selectedPlayer)
+		if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+			local root = target.Character.HumanoidRootPart
+			LocalPlayer.Character:MoveTo(root.Position + Vector3.new(0, 5, 0))
+		end
+	end
+})
+
+TeleportTab:CreateButton({
+	Name = "Teleport Player Base",
+	Callback = function()
+		if not selectedPlayer then
+			return
+		end
+
+		local propertiesFolder = Workspace:FindFirstChild("Properties")
+		if not propertiesFolder then
+			return
+		end
+
+		for _, property in ipairs(propertiesFolder:GetChildren()) do
+			if property:IsA("Model") and property.Name == "Property" then
+				local owner = property:FindFirstChild("Owner")
+				if owner and owner.Value == selectedPlayer then
+					local originSquare = property:FindFirstChild("OriginSquare")
+					if originSquare then
+						local originCFrame = originSquare:FindFirstChild("OriginCFrame")
+						if originCFrame and originCFrame.Value then
+							LocalPlayer.Character:SetPrimaryPartCFrame(originCFrame.Value + Vector3.new(0, 5, 0))
+							return
+						end
+					end
+				end
+			end
+		end
+	end
+})
+
 local SlotTab = Window:CreateTab("Slot", "grid-3x3")
 SlotTab:CreateSection("Slot")
 
@@ -191,6 +277,12 @@ local LoadButton = SlotTab:CreateButton({
                 :WaitForChild("RequestLoad")
                 :InvokeServer(unpack(args))
         end)
+
+		Notify({
+			Title = "Slot Loaded",
+			Text = "Slot " .. selectedSlot .. "Loaded successfully.",
+ 			Duration = 3
+		})
     end
 })
 
