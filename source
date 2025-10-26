@@ -1,0 +1,259 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "Helixia Hub",
+    LoadingTitle = "Loading...",
+    LoadingSubtitle = "HELIXIA HUB",
+    ConfigurationSaving = {
+        Enabled = false,
+        FolderName = "HelixiaHub",
+        FileName = "Settings"
+    },
+    Discord = {
+        Enabled = false,
+        Invite = "",
+        RememberJoins = true
+    },
+    KeySystem = false,
+    KeySettings = {
+        Title = "Toprak Hub Key",
+        Subtitle = "Giriş Anahtarı",
+        Note = "Discord'dan key al",
+        FileName = "ToprakKey",
+        SaveKey = true,
+        GrabKeyFromSite = false,
+        Key = "1234"
+    }
+})
+
+local PlayerTab = Window:CreateTab("Player", "user")
+PlayerTab:CreateSection("Player")
+
+PlayerTab:CreateSlider({
+	Name = "Walk Speed",
+	Range = {16, 300},
+	Increment = 5,
+	Suffix = "WS",
+	CurrentValue = 16,
+	Callback = function(Value)
+		local player = game.Players.LocalPlayer
+		if player.Character and player.Character:FindFirstChild("Humanoid") then
+			player.Character.Humanoid.WalkSpeed = Value
+		end
+	end,
+})
+
+PlayerTab:CreateSlider({
+	Name = "Jump Power",
+	Range = {50, 500},
+	Increment = 10,
+	Suffix = "JP",
+	CurrentValue = 50,
+	Callback = function(Value)
+		local player = game.Players.LocalPlayer
+		if player.Character and player.Character:FindFirstChild("Humanoid") then
+			player.Character.Humanoid.JumpPower = Value
+		end
+	end,
+})
+
+local UIS = game:GetService("UserInputService")
+local InfiniteJumpEnabled = false
+
+PlayerTab:CreateToggle({
+	Name = "Infinite Jump",
+	CurrentValue = false,
+	Flag = "InfiniteJumpToggle",
+	Callback = function(Value)
+		InfiniteJumpEnabled = Value
+	end,
+})
+
+UIS.JumpRequest:Connect(function()
+	if InfiniteJumpEnabled then
+		local player = game.Players.LocalPlayer
+		if player.Character and player.Character:FindFirstChild("Humanoid") then
+			player.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+		end
+	end
+end)
+
+local NoclipEnabled = false
+PlayerTab:CreateToggle({
+	Name = "Noclip",
+	CurrentValue = false,
+	Flag = "NoclipToggle",
+	Callback = function(Value)
+		NoclipEnabled = Value
+	end,
+})
+
+game:GetService("RunService").Stepped:Connect(function()
+	if NoclipEnabled then
+		local player = game.Players.LocalPlayer
+		if player.Character then
+			for _, part in ipairs(player.Character:GetChildren()) do
+				if part:IsA("BasePart") then
+					part.CanCollide = false
+				end
+			end
+		end
+	end
+end)
+
+local WorldTab = Window:CreateTab("World", "earth")
+
+WorldTab:CreateSection("Water")
+
+WorldTab:CreateToggle({
+	Name = "Walk on water",
+	CurrentValue = false,
+	Flag = "WalkOnWaterToggle",
+	Callback = function(Value)
+		local waterModel = game.Workspace:FindFirstChild("Water")
+
+		if waterModel then
+			for _, part in ipairs(waterModel:GetDescendants()) do
+				if part:IsA("BasePart") and part.Name == "Water" then
+					if Value then
+						part.CanCollide = true
+						part.CanTouch = true
+						part.CanQuery = true
+					else
+						part.CanCollide = false
+						part.CanTouch = false
+						part.CanQuery = false
+					end
+				end
+			end
+		else
+			warn("Water modeli bulunamadı!")
+		end
+	end,
+})
+
+WorldTab:CreateToggle({
+	Name = "Remove water",
+	CurrentValue = false,
+	Flag = "RemoveWaterToggle",
+	Callback = function(Value)
+		local waterModel = game.Workspace:FindFirstChild("Water")
+
+		if waterModel then
+			for _, part in ipairs(waterModel:GetDescendants()) do
+				if part:IsA("BasePart") and part.Name == "Water" then
+					if Value then
+						part.Transparency = 1
+						part.CanCollide = false
+						part.CanTouch = false
+					else
+						part.Transparency = 0
+						part.CanCollide = true
+						part.CanTouch = true
+					end
+				end
+			end
+		else
+			warn("Water modeli bulunamadı!")
+		end
+	end,
+})
+
+local SlotTab = Window:CreateTab("Slot", "grid-3x3")
+SlotTab:CreateSection("Slot")
+
+local selectedSlot = 1
+
+local SlotDropdown = SlotTab:CreateDropdown({
+    Name = "Select Slot",
+    Options = {"1", "2", "3", "4", "5", "6"},
+    CurrentOption = {"1"},
+    MultipleOptions = false,
+    Flag = "SelectedSlot",
+    Callback = function(option)
+        selectedSlot = tonumber(option[1]) or 1
+    end
+})
+
+local LoadButton = SlotTab:CreateButton({
+    Name = "Load Slot",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+
+        local args = {
+            selectedSlot,
+            player
+        }
+
+        local success, err = pcall(function()
+            game:GetService("ReplicatedStorage")
+                :WaitForChild("LoadSaveRequests")
+                :WaitForChild("RequestLoad")
+                :InvokeServer(unpack(args))
+        end)
+    end
+})
+
+local currentSpeed = 1
+
+local VehicleTab = Window:CreateTab("Vehicle", "car")
+
+VehicleTab:CreateSection("Vehicle")
+
+local player = game.Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local VehicleFolder = game.Workspace:FindFirstChild("PlayerModels")
+
+local CurrentSpeedMultiplier = 1
+
+VehicleTab:CreateSlider({
+	Name = "Vehicle Speed",
+	Range = {1, 6},
+	Increment = 0.1,
+	Suffix = "x",
+	CurrentValue = 1,
+	Callback = function(Value)
+		CurrentSpeedMultiplier = Value
+
+		if not VehicleFolder then
+			warn("PlayerModels klasörü bulunamadı!")
+			return
+		end
+
+		local function getOwnedVehicles()
+			local owned = {}
+			for _, model in ipairs(VehicleFolder:GetChildren()) do
+				local driveSeat = model:FindFirstChildOfClass("VehicleSeat") or model:FindFirstChild("DriveSeat")
+				local owner = model:FindFirstChild("Owner")
+				local ownerString = owner and owner:FindFirstChild("OwnerString")
+
+				if driveSeat and ownerString and ownerString.Value == player.Name then
+					table.insert(owned, model)
+
+				end
+			end
+			return owned
+		end
+
+		local ownedVehicles = getOwnedVehicles()
+		
+			for _, v in ipairs(ownedVehicles) do
+				local config = v:FindFirstChild("Configuration")
+				if config and config:FindFirstChild("MaxSpeed") then
+					config.MaxSpeed.Value = CurrentSpeedMultiplier
+				end
+		end
+	end,
+})
+
+local SettingsTab = Window:CreateTab("Settings", "settings")
+SettingsTab:CreateSection("Settings")
+
+SettingsTab:CreateButton({
+    Name = "Destroy Menu",
+    Callback = function()
+        Rayfield:Destroy()
+    end
+})
+
+Rayfield:LoadConfiguration()
