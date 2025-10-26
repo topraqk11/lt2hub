@@ -39,28 +39,35 @@ local TreeSection = PlayerTab:CreateSection("Trees")
 local spookyLabel = PlayerTab:CreateLabel("Spooky: Not Found", "tree-pine")
 
 local function checkSpookyTrees()
-	local spookyFound = false
+	-- Sürekli kontrol için döngü
+task.spawn(function()
+    while true do
+        local spookyFound = false
 
-	for _, region in ipairs(workspace:GetChildren()) do
-		if region:IsA("Model") and region.Name == "TreeRegion" then
-			for _, model in ipairs(region:GetChildren()) do
-				if model:IsA("Model") then
-					local treeClass = model:FindFirstChild("TreeClass")
-					if treeClass and treeClass:IsA("StringValue") and treeClass.Value == "Spooky" then
-						spookyFound = true
-						break
-					end
-				end
-			end
-		end
-		if spookyFound then break end
-	end
+        for _, region in ipairs(workspace:GetChildren()) do
+            if region:IsA("Model") and region.Name == "TreeRegion" then
+                for _, model in ipairs(region:GetChildren()) do
+                    if model:IsA("Model") then
+                        local treeClass = model:FindFirstChild("TreeClass")
+                        if treeClass and treeClass:IsA("StringValue") and treeClass.Value == "Spooky" then
+                            spookyFound = true
+                            break
+                        end
+                    end
+                end
+            end
+            if spookyFound then break end
+        end
 
-	if spookyFound then
-		spookyLabel:Set("Spooky: Available")
-	else
-		spookyLabel:Set("Spooky: Not Found")
-	end
+        if spookyFound then
+            spookyLabel:Set("Spooky: Available")
+        else
+            spookyLabel:Set("Spooky: Not Found")
+        end
+
+        task.wait(1) -- 1 saniye bekle, sonra tekrar kontrol et
+    end
+end)v
 end
 
 checkSpookyTrees()
