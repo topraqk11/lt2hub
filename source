@@ -104,7 +104,7 @@ local function checkSpookyTrees()
 
                 if not spookyButtonCreated then
                     spookyButtonCreated = true
-                    spookyButton = TreeSection:CreateButton({
+                    spookyButton = HomeTab:CreateButton({
                         Name = "Teleport Spooky",
                         Callback = function()
                             local woodParts = {}
