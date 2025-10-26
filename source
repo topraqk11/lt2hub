@@ -166,6 +166,53 @@ WorldTab:CreateToggle({
 })
 
 local TeleportTab = Window:CreateTab("Teleport", "map-pin")
+
+TeleportTab:CreateSection("Location Teleport")
+
+local locations = {
+	["Shop"] = CFrame.new(120, 20, -200),
+	["Bridge"] = CFrame.new(150, 25, -350),
+	["Cave Entrance"] = CFrame.new(80, 15, -100),
+	["Volcano"] = CFrame.new(300, 50, -600),
+	["Spawn Area"] = CFrame.new(100, 20, -150),
+}
+
+local locationNames = {}
+for name, _ in pairs(locations) do
+	table.insert(locationNames, name)
+end
+
+local selectedLocation = nil
+
+local LocationDropdown = TeleportTab:CreateDropdown({
+	Name = "Select Location",
+	Options = locationNames,
+	CurrentOption = {},
+	MultipleOptions = false,
+	Flag = "SelectedLocation",
+	Callback = function(option)
+		selectedLocation = option[1]
+	end
+})
+
+TeleportTab:CreateButton({
+	Name = "Teleport to Location",
+	Callback = function()
+		if not selectedLocation then
+			warn("Lütfen bir konum seç!")
+			return
+		end
+
+		local cframe = locations[selectedLocation]
+		if cframe and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+			LocalPlayer.Character:SetPrimaryPartCFrame(cframe + Vector3.new(0, 5, 0))
+		else
+			warn("Işınlanma başarısız oldu! Karakter veya CFrame bulunamadı.")
+		end
+	end
+})
+
+
 TeleportTab:CreateSection("Player Teleport")
 
 local function GetPlayerNames()
