@@ -171,9 +171,7 @@ TeleportTab:CreateSection("Player Teleport")
 local function GetPlayerNames()
 	local names = {}
 	for _, plr in ipairs(Players:GetPlayers()) do
-		if plr ~= LocalPlayer then
-			table.insert(names, plr.Name)
-		end
+		table.insert(names, plr.Name)
 	end
 	return names
 end
@@ -230,7 +228,7 @@ TeleportTab:CreateButton({
 		for _, property in ipairs(propertiesFolder:GetChildren()) do
 			if property:IsA("Model") and property.Name == "Property" then
 				local owner = property:FindFirstChild("Owner")
-				if owner and owner.Value == selectedPlayer then
+				if owner and tostring(owner.Value) == selectedPlayer then
 					local originSquare = property:FindFirstChild("OriginSquare")
 					if originSquare then
 						local originCFrame = originSquare:FindFirstChild("OriginCFrame")
