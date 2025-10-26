@@ -182,26 +182,15 @@ for name, _ in pairs(locations) do
 	table.insert(locationNames, name)
 end
 
-local selectedLocation = nil
-
-local LocationDropdown = TeleportTab:CreateDropdown({
+TeleportTab:CreateDropdown({
 	Name = "Select Location",
 	Options = locationNames,
 	CurrentOption = {},
 	MultipleOptions = false,
 	Flag = "SelectedLocation",
 	Callback = function(option)
-		selectedLocation = option[1]
-	end
-})
-
-TeleportTab:CreateButton({
-	Name = "Teleport to Location",
-	Callback = function()
-		if not selectedLocation then
-			warn("Lütfen bir konum seç!")
-			return
-		end
+		local selectedLocation = option[1]
+		if not selectedLocation then return end
 
 		local cframe = locations[selectedLocation]
 		if cframe and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
