@@ -33,52 +33,10 @@ local Window = Rayfield:CreateWindow({
     }
 })
 
-local HomeTab = Window:CreateTab("Home", 6026568193);
+local PlayerTab = Window:CreateTab("Player", "user")
 
-local creditsSection = HomeTab:CreateSection("Credits");
-local Label = HomeTab:CreateLabel("Owner: Memati", "crown")
-
-local serverSection = HomeTab:CreateSection("Server");
-HomeTab:CreateButton({
-	Name = "Rejoin Server",
-	Callback = function()
-		local TeleportService = game:GetService("TeleportService");
-		TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer);
-	end
-});
-
-HomeTab:CreateButton({
-	Name = "Join Another Server",
-	Callback = function()
-		local TeleportService = game:GetService("TeleportService");
-		local HttpService = game:GetService("HttpService");
-		local Servers = {};
-		local cursor;
-		local success, result = pcall(function()
-			return HttpService:JSONDecode(game:HttpGet(("https://games.roblox.com/v1/games/%d/servers/Public?limit=100"):format(game.PlaceId)));
-		end);
-		if success and result and result.data then
-			for _, server in ipairs(result.data) do
-				if server.playing < server.maxPlayers then
-					table.insert(Servers, server);
-				end;
-			end;
-		end;
-		if #Servers > 0 then
-			local randomServer = Servers[math.random(1, #Servers)];
-			TeleportService:TeleportToPlaceInstance(game.PlaceId, randomServer.id, LocalPlayer);
-		else
-			Notify({
-                Title = "Error",
-                Description = "No available servers found.",
-                Duration = 3
-            })
-		end;
-	end
-});
-
-local TreeSection = HomeTab:CreateSection("Trees")
-local spookyLabel = HomeTab:CreateLabel("Spooky: Not Found", "tree-pine")
+local TreeSection = PlayerTab:CreateSection("Trees")
+local spookyLabel = PlayerTab:CreateLabel("Spooky: Not Found", "tree-pine")
 
 local function checkSpookyTrees()
 	local spookyFound = false
@@ -113,8 +71,6 @@ workspace.ChildAdded:Connect(function(child)
 		checkSpookyTrees()
 	end
 end)
-
-local PlayerTab = Window:CreateTab("Player", "user")
 
 PlayerTab:CreateSection("Player")
 
