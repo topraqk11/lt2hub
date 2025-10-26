@@ -74,11 +74,9 @@ local function checkSpookyTrees()
                     spookyButton = PlayerTab:CreateButton({
                         Name = "Teleport Spooky",
                         Callback = function()
-                            local woodSection = spookyFound:FindFirstChild("WoodSection")
-                            if woodSection then
                                 local firstPart = nil
-                                for _, part in ipairs(woodSection:GetChildren()) do
-                                    if part:IsA("BasePart") then
+                                for _, part in ipairs(spookyFound:GetChildren()) do
+                                    if part:IsA("BasePart") and part.Name == "WoodSection" then
                                         firstPart = part
                                         break
                                     end
@@ -88,9 +86,6 @@ local function checkSpookyTrees()
                                 else
                                     warn("WoodSection içindeki part bulunamadı veya karakter yok!")
                                 end
-                            else
-                                warn("Spooky modelinde WoodSection bulunamadı!")
-                            end
                         end
                     })
                 end
