@@ -42,8 +42,7 @@ HomeTab:CreateButton({
 	Title = "Rejoin Server",
 	Callback = function()
 		local TeleportService = game:GetService("TeleportService");
-		local Players = game:GetService("Players");
-		TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, Players.LocalPlayer);
+		TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer);
 	end
 });
 
@@ -51,7 +50,6 @@ HomeTab:CreateButton({
 	Title = "Join Another Server",
 	Callback = function()
 		local TeleportService = game:GetService("TeleportService");
-		local Players = game:GetService("Players");
 		local HttpService = game:GetService("HttpService");
 		local Servers = {};
 		local cursor;
@@ -67,7 +65,7 @@ HomeTab:CreateButton({
 		end;
 		if #Servers > 0 then
 			local randomServer = Servers[math.random(1, #Servers)];
-			TeleportService:TeleportToPlaceInstance(game.PlaceId, randomServer.id, Players.LocalPlayer);
+			TeleportService:TeleportToPlaceInstance(game.PlaceId, randomServer.id, LocalPlayer);
 		else
 			Notify({
                 Title = "Error",
