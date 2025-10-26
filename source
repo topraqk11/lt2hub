@@ -37,65 +37,83 @@ local PlayerTab = Window:CreateTab("Player", "user")
 
 local TreeSection = PlayerTab:CreateSection("Trees")
 local spookyLabel = PlayerTab:CreateLabel("Spooky: Not Found", "tree-pine")
-local teleportButton -- Button referansı, sonradan ekleyeceğiz
 
-local function findFirstSpookyWoodCFrame()
-    for _, region in ipairs(workspace:GetChildren()) do
-        if region:IsA("Model") and region.Name == "TreeRegion" then
-            for _, model in ipairs(region:GetChildren()) do
-                if model:IsA("Model") then
-                    local treeClass = model:FindFirstChild("TreeClass")
-                    if treeClass and treeClass:IsA("StringValue") and treeClass.Value == "Spooky" then
-                        local woodSections = {}
-                        for _, part in ipairs(model:GetChildren()) do
-                            if part:IsA("BasePart") and part.Name == "WoodSection" then
-                                table.insert(woodSections, part)
-                            end
-                        end
-                        if #woodSections > 0 then
-                            return woodSections[1].CFrame
-                        end
-                    end
-                end
-            end
-        end
-    end
-    return nil
-end
+local spookyButtonCreated = false
+local spookyButton = nil
 
 local function checkSpookyTrees()
     task.spawn(function()
         while true do
-            local cframe = findFirstSpookyWoodCFrame()
-            if cframe then
+            local spookyFound = nil
+
+            -- Spooky olan modeli bul
+            for _, region in ipairs(workspace:GetChildren()) do
+                if region:IsA("Model") and region.Name == "TreeRegion" then
+                    for _, model in ipairs(region:GetChildren()) do
+                        if model:IsA("Model") then
+                            local treeClass = model:FindFirstChild("TreeClass")
+                            if treeClass and treeClass:IsA("StringValue") and treeClass.Value == "Spooky" then
+                                spookyFound = model
+                                break
+                            end
+                        end
+                    end
+                end
+                if spookyFound then break end
+            end
+
+            -- Label güncelle
+            if spookyFound then
                 spookyLabel:Set("Spooky: Available")
 
-                -- Button yoksa ekle
-                if not teleportButton then
-                    teleportButton = PlayerTab:CreateButton({
+                -- Eğer buton yoksa oluştur
+                if not spookyButtonCreated then
+                    spookyButtonCreated = true
+                    spookyButton = PlayerTab:CreateButton({
                         Name = "Teleport Spooky",
                         Callback = function()
-                            local player = game.Players.LocalPlayer
-                            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                                player.Character:SetPrimaryPartCFrame(cframe + Vector3.new(0,5,0))
+                            -- Spooky modelinin içindeki WoodSection partlarını bul
+                            local woodParts = {}
+                            for _, child in ipairs(spookyFound:GetChildren()) do
+                                if child:IsA("BasePart") and child.Name == "WoodSection" then
+                                    table.insert(woodParts, child)
+                                end
+                            end
+
+                            if #woodParts > 0 and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                                local targetPart = woodParts[1] -- ilk WoodSection
+                                LocalPlayer.Character:SetPrimaryPartCFrame(targetPart.CFrame + Vector3.new(0,5,0))
+                            else
+                                warn("WoodSection bulunamadı veya karakter yok!")
                             end
                         end
                     })
                 end
             else
                 spookyLabel:Set("Spooky: Not Found")
-                -- Eğer button varsa sil
-                if teleportButton then
-                    teleportButton:Remove()
-                    teleportButton = nil
+                
+                -- Eğer buton varsa sil
+                if spookyButtonCreated and spookyButton then
+                    spookyButton:Remove()
+                    spookyButtonCreated = false
+                    spookyButton = nil
                 end
             end
+
             task.wait(1)
         end
     end)
 end
 
 checkSpookyTrees()
+
+workspace.ChildAdded:Connect(function(child)
+    if child.Name == "TreeRegion" then
+        task.wait(1)
+        checkSpookyTrees()
+    end
+end)
+
 
 
 PlayerTab:CreateSection("Player")
