@@ -38,7 +38,7 @@ local creditsSection = HomeTab:CreateSection("Credits");
 local Label = HomeTab:CreateLabel("Owner: Memati", "crown")
 
 local serverSection = HomeTab:CreateSection("Server");
-HomeTab:AddButton({
+HomeTab:CreateButton({
 	Title = "Rejoin Server",
 	Callback = function()
 		local TeleportService = game:GetService("TeleportService");
@@ -47,7 +47,7 @@ HomeTab:AddButton({
 	end
 });
 
-HomeTab:AddButton({
+HomeTab:CreateButton({
 	Title = "Join Another Server",
 	Callback = function()
 		local TeleportService = game:GetService("TeleportService");
