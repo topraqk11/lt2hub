@@ -72,7 +72,7 @@ local function checkSpookyTrees()
 
                 -- Button yoksa ekle
                 if not teleportButton then
-                    teleportButton = TreeSection:CreateButton({
+                    teleportButton = PlayerTab:CreateButton({
                         Name = "Teleport Spooky",
                         Callback = function()
                             local player = game.Players.LocalPlayer
