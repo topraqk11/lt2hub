@@ -38,6 +38,7 @@ local PlayerTab = Window:CreateTab("Player", "user")
 local TreeSection = PlayerTab:CreateSection("Trees")
 local spookyLabel = PlayerTab:CreateLabel("Spooky: Not Found", "tree-pine")
 
+-- Bu değişken, buton zaten eklenmiş mi kontrolü için
 local spookyButtonCreated = false
 local spookyButton = nil
 
@@ -72,19 +73,22 @@ local function checkSpookyTrees()
                     spookyButton = PlayerTab:CreateButton({
                         Name = "Teleport Spooky",
                         Callback = function()
-                            -- Spooky modelinin içindeki WoodSection partlarını bul
-                            local woodParts = {}
-                            for _, child in ipairs(spookyFound:GetChildren()) do
-                                if child:IsA("BasePart") and child.Name == "WoodSection" then
-                                    table.insert(woodParts, child)
+                            local woodSection = spookyFound:FindFirstChild("WoodSection")
+                            if woodSection then
+                                local firstPart = nil
+                                for _, part in ipairs(woodSection:GetChildren()) do
+                                    if part:IsA("BasePart") then
+                                        firstPart = part
+                                        break
+                                    end
                                 end
-                            end
-
-                            if #woodParts > 0 and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                                local targetPart = woodParts[1] -- ilk WoodSection
-                                LocalPlayer.Character:SetPrimaryPartCFrame(targetPart.CFrame + Vector3.new(0,5,0))
+                                if firstPart and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                                    LocalPlayer.Character:SetPrimaryPartCFrame(firstPart.CFrame + Vector3.new(0,5,0))
+                                else
+                                    warn("WoodSection içindeki part bulunamadı veya karakter yok!")
+                                end
                             else
-                                warn("WoodSection bulunamadı veya karakter yok!")
+                                warn("Spooky modelinde WoodSection bulunamadı!")
                             end
                         end
                     })
@@ -113,7 +117,6 @@ workspace.ChildAdded:Connect(function(child)
         checkSpookyTrees()
     end
 end)
-
 
 
 PlayerTab:CreateSection("Player")
